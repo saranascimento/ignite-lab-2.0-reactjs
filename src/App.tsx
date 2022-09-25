@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { gql, useQuery } from "@apollo/client";
+import { useEffect } from "react";
+import { client } from "./lib/apollo";
 
-function App() {
-  const [count, setCount] = useState(0)
+const GET_LESSONS_QUERY = gql`
+  query {
+    lessons {
+      id
+      title
+    }
+  }
+`;
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+interface Lesson {
+  id: string;
+  title: string;
 }
 
-export default App
+function App() {
+  // useEffect(() => {
+  //   client
+  //     .query({
+  //       query: GET_LESSONS_QUERY,
+  //     })
+  //     .then((response) => {
+  //       console.log(response.data);
+  //     });
+  // }, []);
+
+  const { data } = useQuery<{ lessons: Lesson[] }>(GET_LESSONS_QUERY);
+
+  console.log(data);
+
+  return (
+    <ul>
+      {data?.lessons.map((lesson) => {
+        return <li key={lesson.id}>{lesson.title}</li>;
+      })}
+    </ul>
+  );
+}
+
+export default App;
